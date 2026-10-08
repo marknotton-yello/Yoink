@@ -34,6 +34,9 @@ untouched. Everything in [`app/`](app) is the GUI I added.
 
 > Not affiliated with or endorsed by Pablo. I just really like his tool.
 
+In short: I yoinked yoinks. And yes, the repo is called **Yoink**, without the S. That's on purpose, because
+it's the app that yoinked the thing that yoinks. 🪝
+
 ## Why does this exist?
 
 Confession time: I'm **terminal-averse**. Terminal-shy. Command-line-curious but commitment-phobic.
