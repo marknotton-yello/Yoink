@@ -1,0 +1,33 @@
+{
+  "name": "yoink",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "yarn@4.18.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "setup": "bash scripts/setup.sh",
+    "setup:all": "bash scripts/setup.sh --all",
+    "tauri:dev": "yarn setup && tauri dev",
+    "tauri:build": "yarn setup && tauri build",
+    "tauri:build:universal": "yarn setup:all && tauri build --target universal-apple-darwin"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}
