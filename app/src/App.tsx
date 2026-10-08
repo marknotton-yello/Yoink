@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import * as backend from "./lib/backend"
+import { APP_VERSION, updateActionLabel, useUpdates } from "./lib/updates"
+import { UpdateToast } from "./UpdateToast"
 import { Logo } from "./logo"
 import { ExternalIcon, AlertIcon, CheckIcon, ClockIcon, DownloadIcon, FolderIcon, MusicIcon, PasteIcon, VideoIcon } from "./icons"
 import { formatDuration, formatEta, formatSpeed, formatBytes, tildify } from "./lib/format"
 import { detectPlatform, isProbablyUrl, type Platform } from "./lib/platforms"
 import { buildChoices, type DownloadChoice, type Progress, type VideoInfo } from "./lib/ytdlp"
 
-const VERSION = "v0.1.0"
+const VERSION = `v${APP_VERSION}`
 const ORIGINAL_AUTHOR = "Pablo Stanley"
 const ORIGINAL_REPO = "https://github.com/pablostanley/yoinks"
 const ORIGINAL_PROFILE = "https://github.com/pablostanley"
@@ -95,8 +97,21 @@ export default function App() {
   const inputRef = useRef<HTMLInputElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const updates = useUpdates()
+  const footerRef = useRef<HTMLElement>(null)
   // jobs the user cancelled, so their rejected promise isn't shown as an error
   const cancelledRef = useRef(new Set<string>())
+
+  // the update toast sits just above the footer, whatever height the footer is
+  useEffect(() => {
+    const footer = footerRef.current
+    if (!footer) return
+    const set = () => document.documentElement.style.setProperty("--footer-actual", `${footer.offsetHeight}px`)
+    const observer = new ResizeObserver(set)
+    observer.observe(footer)
+    set()
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!aboutOpen) return
@@ -435,7 +450,9 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="footer">
+      <UpdateToast updates={updates} />
+
+      <footer className="footer" ref={footerRef}>
         <div className="footer__meta">
           {backend.isAndroid ? (
             <button className="btn btn--ghost" onClick={() => void backend.openDownloads()} title="Saved to Download/Yoink">
@@ -486,6 +503,28 @@ export default function App() {
                 Yoink is a graphical version of <strong>yoinks</strong>, the original terminal app created by{" "}
                 <strong>{ORIGINAL_AUTHOR}</strong>. All credit for the idea and the download flow goes to them.
               </p>
+              <div className="update-row">
+                <span className="meta">
+                  {updates.error
+                    ? updates.error
+                    : updates.checking
+                      ? "Checking for updates…"
+                      : updates.latest
+                        ? `Version ${updates.latest.version} is available.`
+                        : updates.checkedOnce
+                          ? "You’re up to date."
+                          : `You’re on ${VERSION}.`}
+                </span>
+                {updates.latest ? (
+                  <button className="btn btn--primary btn--small" onClick={() => void updates.install()} disabled={updates.status === "installing"}>
+                    {updateActionLabel()}
+                  </button>
+                ) : (
+                  <button className="btn btn--secondary btn--small" onClick={() => void updates.check(true)} disabled={updates.checking}>
+                    Check for updates
+                  </button>
+                )}
+              </div>
               <p className="meta">Powered by yt-dlp and ffmpeg. Released under the MIT licence.</p>
               <p className="meta">Only download what you have the right to keep, and be excellent to creators.</p>
               <div className="links">

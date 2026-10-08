@@ -5,3 +5,7 @@ src-tauri/gen/schemas
 .yarn
 *.log
 src-tauri/binaries/
+src-tauri/signing/
+*.jks
+keystore.properties
+release-staging/

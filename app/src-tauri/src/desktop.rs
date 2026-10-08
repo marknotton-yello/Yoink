@@ -280,6 +280,12 @@ pub fn open_url(url: String) {
     }
 }
 
+// the manifest key for this machine, e.g. "darwin-aarch64"
+#[tauri::command]
+pub fn platform_key() -> String {
+    format!("darwin-{}", std::env::consts::ARCH)
+}
+
 #[tauri::command]
 pub fn default_out_dir() -> String {
     let home = std::env::var("HOME").unwrap_or_default();

@@ -14,6 +14,14 @@ val tauriProperties = Properties().apply {
     }
 }
 
+// Release signing lives OUTSIDE gen/ (which `tauri android init` regenerates). This
+// block lives in gen/, so re-init loses it. If release APKs suddenly come out
+// unsigned, re-apply it (see docs/RELEASING.md).
+val keystoreProps = Properties().apply {
+    val f = file("../../../signing/keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
 android {
     compileSdk = 37
     namespace = "studio.yello.yoink"
@@ -24,6 +32,16 @@ android {
         targetSdk = 37
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()
         versionName = tauriProperties.getProperty("tauri.android.versionName", "1.0")
+    }
+    signingConfigs {
+        if (keystoreProps.containsKey("storeFile")) {
+            create("release") {
+                storeFile = file("../../../signing/" + keystoreProps["storeFile"])
+                storePassword = keystoreProps["storePassword"] as String
+                keyAlias = keystoreProps["keyAlias"] as String
+                keyPassword = keystoreProps["keyPassword"] as String
+            }
+        }
     }
     buildTypes {
         getByName("debug") {
@@ -39,6 +57,9 @@ android {
             }
         }
         getByName("release") {
+            if (keystoreProps.containsKey("storeFile")) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             optimization {
                enable = true
             }

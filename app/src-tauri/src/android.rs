@@ -85,3 +85,9 @@ pub async fn open_url(h: State<'_, YoinkHandle>, url: String) -> Result<(), Stri
 pub async fn open_downloads(h: State<'_, YoinkHandle>) -> Result<(), String> {
     h.0.run_mobile_plugin_async::<Value>("openDownloads", json!({})).await.map(|_| ()).map_err(msg)
 }
+
+// Android has no in-app updater, but it reads the same manifest
+#[tauri::command]
+pub fn platform_key() -> String {
+    "android-arm64".into()
+}

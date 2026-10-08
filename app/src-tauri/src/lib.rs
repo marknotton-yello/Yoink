@@ -16,20 +16,24 @@ pub struct ProbeResult {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let builder = tauri::Builder::default();
+    let builder = tauri::Builder::default().plugin(tauri_plugin_http::init());
 
     #[cfg(desktop)]
     let builder = builder
         .manage(desktop::Active::default())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
+        // in-app updates are desktop-only; Android is offered a download instead
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![
             desktop::probe,
             desktop::download,
             desktop::cancel_download,
             desktop::reveal,
             desktop::default_out_dir,
-            desktop::open_url
+            desktop::open_url,
+            desktop::platform_key
         ]);
 
     #[cfg(target_os = "android")]
@@ -41,7 +45,8 @@ pub fn run() {
         android::reveal,
         android::default_out_dir,
         android::open_url,
-        android::open_downloads
+        android::open_downloads,
+        android::platform_key
     ]);
 
     builder.run(tauri::generate_context!()).expect("error while running Yoink");

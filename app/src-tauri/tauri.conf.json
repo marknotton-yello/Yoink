@@ -29,7 +29,8 @@
   "bundle": {
     "active": true,
     "targets": [
-      "app"
+      "app",
+      "dmg"
     ],
     "icon": [
       "icons/32x32.png",
@@ -42,5 +43,13 @@
       "binaries/yt-dlp",
       "binaries/ffmpeg"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/marknotton-yello/Yoink/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
+    }
   }
 }
